@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genix</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <div id="chatContainer" class="chat-container">
+        <div id="chatLog" class="chat-log">
+            <div id="chatLogUser"></div>
+        </div>
+        <div class="user-input">
+          <input type="text" id="userInput" class="input-box" placeholder="მომწერე ჩვენს თემატიკასთან დაკავშირებით..." />
+          <button id="sendButton" class="send-button"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+
+    <script src="index.js"></script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const chatLog = document.getElementById("chatLog");
+const userInput = document.getElementById("userInput");
+const sendButton = document.getElementById("sendButton");
+
+
+function initializeChatbot() {
+
+  function showTypingAnimation() {
+    const typingIndicator = document.createElement("div");
+    typingIndicator.className = "typing-indicator";
+    typingIndicator.innerHTML = `
+      <span></span>
+      <span></span>
+      <span></span>
+    `;
+    chatLog.appendChild(typingIndicator);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+  
+  function removeTypingAnimation() {
+    const typingIndicator = document.querySelector(".typing-indicator");
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+  
+  
+
+  // Bot sends a message
+  function botSendMessage(message) {
+    const botMessage = document.createElement("div");
+    botMessage.className = "message bot-message";
+    botMessage.innerText = message;
+    chatLog.appendChild(botMessage);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+// User sends a message
+function userSendMessage(message) {
+  const userMessageContainer = document.createElement("div");
+  userMessageContainer.className = "user-message-Main-div";
+
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user-message";
+  userMessage.innerText = message;
+
+  userMessageContainer.appendChild(userMessage);
+  chatLog.appendChild(userMessageContainer);
+  chatLog.scrollTop = chatLog.scrollHeight;
+
+  // Process user's message and get bot's response
+  const response = getBotResponse(message);
+
+  // Disable send button and user input
+  sendButton.disabled = true;
+  userInput.disabled = true;
+
+  // Display typing animation
+  showTypingAnimation();
+
+  // Simulate delay before bot's response
+  setTimeout(() => {
+    removeTypingAnimation();
+    botSendMessage(response);
+
+    // Enable send button and user input after bot's response
+    sendButton.disabled = false;
+    userInput.disabled = false;
+    userInput.focus();
+  }, 1500);
+}
+
+
+  // Question-response mapping
+const questionResponseMapping = [
+
+    {
+      questions: ["რა გქვია?", "რა გქვია", "რა არის შენი სახელი?", "რა არის შენი სახელი", "შენ რა გქვია?", "შენ რა გქვია", "შენი სახელი რა არის?", "შენი სახელი რა არის", "მაინტერესებს შენი სახელი?", "მაინტერესებს შენი სახელი", "შენი სახელი?", "შენი სახელი", "როგორ მოგმართოთ?", "როგორ მოგმართოთ", "როგორ მოგმართო?", "როგორ მოგმართო", "მე მაინტერესებს შენი სახელი", "შენი სახელი შეიძლება?", "შენ სახელს მეტყვი?", "შენი სახელი შეიძლება", "მითხარი შენი სახელი", "მომწერე შენი სახელი", "მომწერე რა გქვია", "მომწერე როგორ მოგმართო", "რა დაგიძახო?", "რა დაგიძახო", "რა გქვია შენ?", "რა გქვია შენ"],
+      response: "მე მქვია ბიოტინი. რით შემიძლია დაგეხმარო?",
+    },
+
+    {
+      questions: ["რატომ დაგარქვეს ბიოტინი?", "რატომ გქვია ბიოტინი?", "რატომ დაგარქვეს ბიოტინი", "რატომ გქვია ბიოტინი", "რატომ გქვია ეგ სახელი?", "რატომ გქვია ეგ სახელი", "რასთან ასოცირდება შენი სახელი?", "რასთან ასოცირდება შენი სახელი", "რას ნიშნავს შენი სახელი?", "რას ნიშნავს შენი სახელი", "მომწერე რას ნიშნავს შენი სახელი", "განმიმარტე შენი სახელი", "მომწერე შენი სახელის მნიშვნელობა", "მომწერე რატომ დაგარქვეს ბიოტინი?", "განმიმარტე შენი სახელის მნიშვნელობა", "ამიხსენი შენი სახელი", "ამიხსენი რატომ გქვია ბიოტინი", "ამიხსენი რატომ გქვია ეგ სახელი", "ამიხსენი რატომ გქვია ეს სახელი", "რატომ გქვია ეს სახელი?", "რატომ გქვია ეს სახელი?", "რატომ გქვია ეს სახელი", "რატომ გქვია?", "რატომ გქვია"],
+      response: "ბიოტინი არის მოლეკულა, რომელიც აუცილებელია ორგანიზმში მრავალი ბიოლოგიური პროცესისთვის. ის ასევე ცნობილია როგორც ვიტამინი B7 ან ვიტამინი H. ბიოტინი მნიშვნელოვანია ნახშირწყლების, ცხიმებისა და ცილების მეტაბოლიზმისთვის და აუცილებელია კანის, თმისა და ფრჩხილების ჯანსაღი შენარჩუნებისთვის. სახელი ბიოტინი შესანიშნავი არჩევანია ჩათბოტისთვის, რომელიც დაპროგრამებულია ბიოლოგიის გათვალისწინებით. ეს იმიტომ, რომ ბიოტინი არის ცნობილი და მნიშვნელოვანი მოლეკულა ბიოლოგიის სფეროში. ამ სახელით კი, ჩატბოტი ადვილად ამოსაცნობი იქნება, როგორც ინსტრუმენტი ბიოლოგიის.",
+    },
+
+    {
+      questions: ["ვინ შეგქმნა?" , "ვინ შეგქმნა" , "ვინ შეგქმნათ?" , "ვინ შეგქმნათ" , "ვის მიერ ხარ შექმნილი?" , "ვის მიერ ხარ შექმნილი" , "ვინ შეგქმნა ბიოტინო?" , "ვინ შეგქმნა ბიოტინო" , "ვინ შეგქმნათ ბიოტინო?" , "ვინ შეგქმნათ ბიოტინო" , "ვის მიერ ხარ შექმნილი ბიოტინო?" , "ვის მიერ ხარ შექმნილი ბიოტინო" , "ბიოტინო ვინ შეგქმნა" , "ბიოტინო ვინ შეგქმნა?"],
+      response: "მე შევიქმენი WEB INVENT-ის მიერ, რომლებსაც სურდათ შეექმნათ ხელოვნური ინტელექტის ასისტენტი, რომელიც დაეხმარებოდა ადამიანებს CRISPR-Cas9-ს შესწავლაში",
+    },
+
+    {
+      questions: ["ვინ დაგაპროექტა?" , "ვინ დაგაპროექტა" , "ვის მიერ ხარ დაპროექტებული?" , "ვის მიერ ხარ დაპროექტებული" , "ვინ დაგაპროექტა ბიოტინო?" , "ვინ დაგაპროექტა ბიოტინო" , "ვის მიერ ხარ დაპროექტებული ბიოტინო?" , "ვის მიერ ხარ დაპროექტებული ბიოტინო"],
+      response: "მე დავპროექტდი WEB INVENT-ის, დეველოპერთა გუნდის მიერ.",
+    },
+
+    {
+      questions: ["მიყვარხარ ბიოტინო" , "ბიოტინო მიყვარხარ", "ლავ იუ", "ლავ უ", "მიყვარხარ", "ძალიან მიყვარხარ", "მიყვარხარ ძალიან"],
+      response: "გმადლობთ კეთილი სიტყვებისთვის! როგორც ხელოვნური ინტელექტის ასისტენტი, მე ვარ აქ, რათა დაგეხმაროთ, გთხოვთ მითხრათ, როგორ შემიძლია დაგეხმაროთ." 
+    },
+
+    {
+      questions: ["როგორ ხარ?", "როგორ ხარ", "რავა ხარ?", "რავა ხარ", "როგორ გიკითხოთ?", "როგორ გიკითხოთ", "როგორ გიკითხო?", "როგორ ხართ?", "როგორ ხართ", "როგორ გრძნობ თავს?", "როგორ გრძნობ თავს", "როგორ ხარ დღეს?", "როგორ ხარ დღეს", "კაკ ძელა?", "კაკ ძელა", "როგორ ბრძანდებით?", "როგორ გიკითხო", "როგორ ბრძანდებით", "როგორ ბრძანდები?", "როგორ ბრძანდები"],
+      response: "კარგად ვარ, გმადლობთ რომ მკითხეთ! რით შემიძლია დაგეხმაროთ?",
+    },
+
+    {
+      questions: ["CRISPR-Cas9?" , "რა არის CRISPR-Cas9?" , "ინფორმაცია CRISPR-Cas9-ზე?" , "CRISPR-Cas9 არის?" , "CRISPR-Cas9" , "რა არის CRISPR-Cas9" , "ინფორმაცია CRISPR-Cas9" , "ინფორმაცია CRISPR-Cas9-ზე" , "CRISPR-Cas9 არის" , "ბიოტინო შეგიძლია მითხრა რა არის CRISPR-Cas9?"],
+      response: "CRISPR-Cas9 არის რევოლუციური გენის რედაქტირების ტექნოლოგია, რომელიც მეცნიერებს საშუალებას აძლევს, ზუსტი ცვლილებები შეიტანონ უჯრედებში დნმ-ის თანმიმდევრობებში. ის მუშაობს მოლეკულის გამოყენებით, სახელად რნმ, რათა წარმართოს ფერმენტი სახელად Cas9 გენომის კონკრეტულ ადგილას, სადაც მას შეუძლია დნმ-ის გაჭრა. ეს საშუალებას აძლევს მკვლევარებს დაამატონ, წაშალონ ან შეცვალონ კონკრეტული გენები, რომლებსაც უზარმაზარი პოტენციალი აქვთ გენეტიკური დაავადებების სამკურნალოდ, ახალი თერაპიის შემუშავებისთვის და ბიოლოგიის შესახებ ჩვენი გაგების გასაუმჯობესებლად. თუმცა, ასევე არსებობს შეშფოთება გენის რედაქტირების ეთიკური შედეგების შესახებ, განსაკუთრებით მაშინ, როდესაც საქმე ეხება ადამიანის ემბრიონის ან ჩანასახის უჯრედების რედაქტირებას, რომლებიც შეიძლება გადაეცეს მომავალ თაობებს.",
+    },
+
+    {
+      questions: ["რას შვები?", "რას შვები", "რას აკეთებ?", "რას აკეთებ", "რითი ხარ დაკავებული?", "რითი ხარ დაკავებული", "რას შვებით?", "რას შვებით","რას აკეთებთ?", "რას აკეთებთ", "რითი ხართ დაკავებული?", "რით ხარ დაკავებული?", "რით ხართ დაკავებული?", "რით ხარ დაკავებული ბიოტინო?"],
+      response: "როგორც ხელოვნური ინტელექტის ასისტენტი, მე ვარ აქ, რათა დაგეხმაროთ, გთხოვთ მითხრათ, როგორ შემიძლია დაგეხმაროთ.",
+    },
+
+    {
+      questions: ["რომელი საათია?", "შეგიძლია მითხრა რომელი საათია?", "შეგიძლიათ მითხრათ რომელი საათია?", "რომელი საათია", "მითხარი საათი", "მაინტერესებს საათი", "მაინტერესებს რომელი საათია", "რომელია საათი?", "რომელია საათი", "მაინტერესებს დრო", "მომწერე ახლანდელი დრო", "მომწერე დრო", "დრო"],
+      response: "ვწუხვარ, მაგრამ როგორც ხელოვნური ინტელექტის ენის მოდელი, არ მაქვს წვდომა დროზე. თუმცა, თქვენ შეგიძლიათ მარტივად შეამოწმოთ მიმდინარე დრო თქვენს კომპიუტერში ან მობილურ მოწყობილობაზე საათის დათვალიერებით ან საძიებო სისტემის გამოყენებით, რათა იპოვოთ მიმდინარე დრო თქვენს მდებარეობაში.",
+    },
+
+    {
+      questions: ["რა ფერია ბალახი?", "რა ფერია ბალახი", "შეგიძლია მითხრა რა ფერია ბალახი?" , "შეგიძლია მითხრა რა ფერია ბალახი" , "ბალახის ფერი რა არის?" , "ბალახის ფერი რა არის" , "ბალახის ფერი რა არი?" , "ბალახის ფერი რა არი" , "ბალახი რა ფერია?" , "ბალახი რა ფერია"],
+      response: "რა ფერი და მწვანე",
+    },
+
+    {
+      questions: ["მოიცადე", "დაიცა", "ერთ წუთს", "მოიცა", "ერთი წუთი", "დამელოდე", "მომიცადე", "შეგიძლია დამიცადო?", "შეგიძლია დამიცადო"],
+      response: "კარგით. მოთმინებით გელოდებით!"
+    },
+
+    {
+      questions: ["გცალიათ?", "გცალიათ", "გცალია", "გცალია?", "გცალიათ რომ დამეხმაროთ?", "გცალიათ, რომ დამეხმაროთ?", "გცალია, რომ დამეხმარო?", "გცალია რომ დამეხმარო", "გცალია რომ დამეხმარო?", "დამეხმარები?", "დამეხმარები", "შეგიძლია დამეხმარო?", "შეგიძლია დამეხმარო", "დახმარება მჭირდება", "შენი დახმარება მჭირდება", "შეგიძლია რომ დამეხმარო?", "შეგიძლიათ რომ დამეხმაროთ?", "შეგიძლია, რომ დამეხმარო?", "შენი დახმარება მჭირდება!", "უნდა დამეხმარო!", "უნდა დამეხმარო", "უკაცრავად, შეგიძლია დამეხმარო?", "უკაცრავად შეგიძლია დამეხმარო", "უკაცრავად შეგიძლია დამეხმარო?", "გთხოვ დამეხმარე რა", "გთხოვ დამეხმარე", "გთხოვთ დამეხმარეთ", "გთხოვ დამეხმარე", "დახმარება მინდა", "დახმარება მინდა!", "დამეხმარები? რაღაც მაინტერესებს", "რაღაც მაინტერესებს, გთხოვ დამეხმარე", "რაღაცის დაზუსტება მინდა დამეხმარე", "მაინტერესებს", "დაინტერესებული ვარ", "შეგიძლია მითხრა", "შეგიძლიათ მითხრათ", "რაღაც კითხვები მაქვს" , "გცალიათ ბიოტინო?", "გცალიათ ბიოტინო", "გცალია ბიოტინო", "გცალია ბიოტინო?", "გცალიათ რომ დამეხმარით ბიოტინო?", "გცალიათ, რომ დამეხმაროთ ბიოტინო?", "გცალია, რომ დამეხმარო ბიოტინო?", "გცალია რომ დამეხმარო ბიოტინო", "გცალია რომ დამეხმარო ბიოტინო?", "დამეხმარები ბიოტინო?", "დამეხმარები ბიოტინო", "შეგიძლია დამეხმარო ბიოტინო?", "შეგიძლია დამეხმარო ბიოტინო", "დახმარება მჭირდება ბიოტინო", "შენი დახმარება მჭირდება ბიოტინო", "შეგიძლია რომ დამეხმარო ბიოტინო?", "შეგიძლიათ რომ დამეხმაროთ ბიოტინო?", "შეგიძლია, რომ დამეხმარო ბიოტინო?", "შენი დახმარება მჭირდება ბიოტინო!", "უნდა დამეხმარო ბიოტინო!", "უნდა დამეხმარო ბიოტინო", "უკაცრავად, შეგიძლია დამეხმარო ბიოტინო?", "უკაცრავად შეგიძლია დამეხმარო ბიოტინო", "უკაცრავად შეგიძლია დამეხმარო ბიოტინო?", "გთხოვ დამეხმარე რა ბიოტინო", "გთხოვ დამეხმარე ბიოტინო", "გთხოვთ დამეხმარეთ ბიოტინო", "გთხოვ დამეხმარე ბიოტინო", "დახმარება მინდა ბიოტინო", "დახმარება მინდა ბიოტინო!", "დამეხმარები ბიოტინო? რაღაც მაინტერესებს", "რაღაც მაინტერესებს, გთხოვ დამეხმარე ბიოტინო", "რაღაცის დაზუსტება მინდა დამეხმარე ბიოტინო", "მაინტერესებს ბიოტინო", "დაინტერესებული ვარ ბიოტინო", "შეგიძლია მითხრა ბიოტინო", "შეგიძლიათ მითხრათ ბიოტინო", "რაღაც კითხვები მაქვს ბიოტინო"],
+      response: "დიახ, გისმენთ. ნუ მოგერიდებათ მკითხეთ!",
+    },
+
+    {
+      questions: ["ბიოტინო", "ჰეიი", "ჰეიიიი", "ჰეიიიი აქ ხარ?" ,"არის აქ ვინმე?", "არის აქ ვინმე", "აქ ხარ?", "ბიოტინო აქ ხარ?", "ბიოტინო!", "ჰეი ბიოტინო", "აქ ხარ", "ბიოტინო მიპასუხე", "მიპასუხე", "მომწერე", "მომწერე ბიოტინო", "ბიოტინო მიპასუხე"],
+      response: "დიახ, გისმენთ. შემიძლია დაგეხმარო?",
+    },
+
+    {
+      questions: ["გამარჯობა!", "გამარჯობათ!", "გამარჯობა", "გამარჯობათ", "ჰეი", "ჰაი", "ჰი" , "დილა მშვიდობისა", "შუადღე მშვიდობისა", "საღამო მშვიდობისა", "სალამი" , "ზდაროვა" , "ზდ", "მოგესალმებით!", "მოგესალმებით", "მოგესალმები!", "მოგესალმები"],
+      response: "გამარჯობათ! გისმენთ რით შემიძლია დაგეხმაროთ?",
+    },
+
+    {
+      questions: ["რა არის ბიოლოგია?", "რა არის ბიოლოგია", "რა შეგიძლია მითხრა ბიოლოგიაზე?", "რა შეგიძლია მითხრა ბიოლოგიაზე", "ბიოლოგიაზე მაინტერესებს ინფორმაცია", "მომწერე რა არის ბიოლოგია", "ბიოლოგია რა არი", "ბიოლოგია რა არი?", "შეგიძლია მითხრა რა არის ბიოლოგია?", "შეგიძლია მითხრა, რა არის ბიოლოგია?", "შეგიძლია ბიოლოგიაზე მიამბო", "რას ნიშნავს ბიოლოგია", "რა არი ბიოლოგია", "განმიმარტე რას ნიშნავს ბიოლოგია", "განმიმარტე რა არის ბიოლოგია"],
+      response: "ბიოლოგია არის ცოცხალი ორგანიზმების მეცნიერული შესწავლა, მათ შორის მათი ფიზიკური სტრუქტურა, ქიმიური პროცესები, მოლეკულური ურთიერთქმედება, ფიზიოლოგიური მექანიზმები, განვითარება და ევოლუცია. ის მოიცავს თემების ფართო სპექტრს, უმცირესი მოლეკულებიდან და უჯრედებიდან მთელ ეკოსისტემებამდე და მთლიანად ბიოსფერომდე. ბიოლოგები იყენებენ მრავალფეროვან მეთოდებსა და ინსტრუმენტებს ბუნების სამყაროს გამოსაკვლევად, მათ შორის დაკვირვებას, ექსპერიმენტებს და მონაცემთა ანალიზს.",
+    }
+  ];
+
+  // Bot logic to generate response based on user's message
+function getBotResponse(message) {
+
+    // Check if the message matches any question group in the mapping
+    const matchedQuestionGroup = questionResponseMapping.find((item) =>
+      item.questions.some((question) =>
+        message.includes(question)
+      )
+    );
+  
+    if (matchedQuestionGroup) {
+      return matchedQuestionGroup.response;
+    } else {
+      return "უკაცრავად, არ ვიცი რას გულისხმობთ \"" + message + "\"-ში შეგიძლიათ მეტი კონტექსტი მოგვაწოდოთ ან დააზუსტოთ თქვენი შეკითხვა?";
+    }
+  }
+  
+
+
+    
+    // Handle user input
+    function handleUserInput() {
+        const message = userInput.value.trim();
+    
+        if (message !== "") {
+          userInput.value = "";
+    
+          userSendMessage(message);
+        }
+      }
+    
+      // Send button click event
+      sendButton.addEventListener("click", handleUserInput);
+    
+      // Enter key press event
+      userInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          handleUserInput();
+        }
+      });
+    
+      // Initial bot message
+      function init() {
+        botSendMessage("გამარჯობა რით შემიძლია დაგეხმაროთ?");
+      }
+    
+      // Initialize the chatbot
+      init();
+    }
+    
+    // Initialize the chatbot when the DOM content is loaded
+    document.addEventListener("DOMContentLoaded", initializeChatbot);
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    * {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: rgb(63, 63, 63);
+}
+
+.chat-container {
+  background-color: #f5f6f7;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chat-log::-webkit-scrollbar {
+  width: .3rem;
+}
+
+.chat-log::-webkit-scrollbar-thumb {
+  width: .3rem;
+  background-color: #888888;
+}
+
+.chat-log::-webkit-scrollbar-track {
+  background-color: #000000;
+}
+
+.chat-log {
+  max-height: 600px;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+}
+
+.user-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.user-message-Main-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.user-message {
+  display: flex;
+  background-color: #0084ff;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  margin-bottom: 10px;
+}
+
+.bot-message {
+  display: flex;
+  justify-content: flex-start;
+  background-color: #cacaca;
+  color: rgb(63, 63, 63);
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  margin-bottom: 10px;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  font-style: italic;
+  background-color: #cacaca;
+  color: #888;
+  width: 50px;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  background-color: #6b6363;
+  border-radius: 50%;
+  animation: typing-indicator-animation 1s infinite;
+}
+
+@keyframes typing-indicator-animation {
+  0% {
+    opacity: 1;
+    transform: scale(0rem);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(0)
+  }
+}
+
+
+.input-box {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: 0.4s all ease;
+  box-sizing: border-box;
+}
+
+.input-box:focus {
+  outline: none;
+  border: 1px solid #000;
+}
+
+.send-button {
+  padding: 10px 20px;
+  background-color: #0084ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.4s all ease;
+}
+
+.send-button:hover {
+  padding: 10px 20px;
+  background-color: #3ca1ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}

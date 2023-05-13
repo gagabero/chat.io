@@ -1,0 +1,153 @@
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: rgb(63, 63, 63);
+}
+
+.chat-container {
+  background-color: #f5f6f7;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chat-log::-webkit-scrollbar {
+  width: .3rem;
+}
+
+.chat-log::-webkit-scrollbar-thumb {
+  width: .3rem;
+  background-color: #888888;
+}
+
+.chat-log::-webkit-scrollbar-track {
+  background-color: #000000;
+}
+
+.chat-log {
+  max-height: 600px;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+}
+
+.user-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.user-message-Main-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.user-message {
+  display: flex;
+  background-color: #0084ff;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  margin-bottom: 10px;
+}
+
+.bot-message {
+  display: flex;
+  justify-content: flex-start;
+  background-color: #cacaca;
+  color: rgb(63, 63, 63);
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+  margin-bottom: 10px;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  font-style: italic;
+  background-color: #cacaca;
+  color: #888;
+  width: 50px;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  background-color: #6b6363;
+  border-radius: 50%;
+  animation: typing-indicator-animation 1s infinite;
+}
+
+@keyframes typing-indicator-animation {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1)
+  }
+}
+
+
+.input-box {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: 0.4s all ease;
+  box-sizing: border-box;
+}
+
+.input-box:focus {
+  outline: none;
+  border: 1px solid #000;
+}
+
+.send-button {
+  padding: 10px 20px;
+  background-color: #0084ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.4s all ease;
+}
+
+.send-button:hover {
+  padding: 10px 20px;
+  background-color: #3ca1ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
